@@ -1,7 +1,7 @@
 // src/components/Cart.jsx
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, clearCart } from '../properties/productSlice';
+import { removeFromCart, clearCart, updateCartQuantity, addToCart } from '../properties/productSlice';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Cart = () => {
@@ -29,6 +29,17 @@ const Cart = () => {
     navigate('/checkout');
   };
 
+  const handleUpdateQuantity = (item, change) => {
+    const newQuantity = item.quantity + change;
+    if (newQuantity > 0 && newQuantity <= item.quantity) {
+      dispatch(updateCartQuantity({ id: item.id, quantity: newQuantity }));
+    }
+  };
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product)); // No limitations on adding to the cart
+  };
+
   return (
     <div>
       <h3>Your Cart</h3>
@@ -39,6 +50,8 @@ const Cart = () => {
           {cart.map((item) => (
             <div key={item.id}>
               <span>{item.name} - ${item.price} (Qty: {item.quantity})</span>
+              <button onClick={() => handleUpdateQuantity(item, -1)}>-</button>
+              <button onClick={() => handleAddToCart(item, 1)}>+</button>
               <button onClick={() => handleRemoveFromCart(item)}>Remove</button>
             </div>
           ))}

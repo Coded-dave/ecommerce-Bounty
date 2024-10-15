@@ -5,26 +5,33 @@ const userSlice = createSlice({
   initialState: {
     users: [],
     currentUser: null,
+    loginError: '', 
   },
   reducers: {
     loginUser: (state, action) => {
         const { username, password, role } = action.payload;
-      
+    
         // Check if state.users is an array to avoid potential errors
         if (Array.isArray(state.users)) {
-          const existingUser = state.users.find(
-            (user) => user.username === username && user.password === password && user.role === role
-          );
-      
-          if (existingUser) {
-            state.currentUser = existingUser;  // Set the currentUser if found
-          } else {
-            console.log('Invalid username, password, or role');  // Better to use console log than alert in a reducer
-          }
+            const existingUser = state.users.find(
+                (user) => user.username === username && user.password === password
+            );
+    
+            if (existingUser) {
+                if (existingUser.role === role) {
+                    state.currentUser = existingUser;  // Set the currentUser if found
+                    state.loginError = '';  // Clear any previous login error
+                } else {
+                    state.loginError = 'Invalid role. Please contact admin for role change.'; // Set role error message
+                }
+            } else {
+                state.loginError = 'Invalid username or password.';  // Set invalid credentials message
+            }
         } else {
-          console.log('User data is not initialized properly.');
+            console.log('User data is not initialized properly.');
+            state.loginError = 'User data is not initialized properly.'; // Set initialization error message
         }
-      },
+    },
       registerUser: (state, action) => {
         const { username, password, role } = action.payload;
         const newUser = { id: Date.now(), username, password, role };
@@ -54,9 +61,13 @@ const userSlice = createSlice({
     deleteUser: (state, action) => {
       state.users = state.users.filter(user => user.id !== action.payload);
     },
+    addUser: (state, action) => {
+        // Add new user to the existing users array
+        state.users.push(action.payload);
+      }
   },
 });
 
-export const { updateUserRole, loginUser, registerUser, setCurrentUser, logoutUser, deleteUser } = userSlice.actions;
+export const { addUser, updateUserRole, loginUser, registerUser, setCurrentUser, logoutUser, deleteUser } = userSlice.actions;
 
 export default userSlice.reducer;

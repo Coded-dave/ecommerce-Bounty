@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../properties/userSlice';
 import { useNavigate } from 'react-router-dom';
@@ -7,9 +7,11 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState(''); // Add password state
   const [role, setRole] = useState('shopper'); // Default role
+  const [error, setError] = useState(''); // State to store error message
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Use navigate from react-router-dom
   const currentUser = useSelector((state) => state.users.currentUser);
+  const loginError = useSelector((state) => state.users.loginError); // Assuming your slice has a loginError state
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,20 +19,31 @@ const Login = () => {
 
     // Dispatch the login action
     dispatch(loginUser(user));
-
-    // Redirect if login is successful and user exists
-    if (currentUser) {
-      navigate('/dashboard'); // Redirect to dashboard
-    }
   };
 
+  // Effect to handle login error
+  useEffect(() => {
+    if (loginError) {
+      setError('Invalid credentials, please try again.'); // Set error message if login failed
+    } else if (currentUser && currentUser.role !== role) {
+      // Check if the role is incorrect
+      setError('Invalid role. Please contact admin for role change.'); // Set error message for invalid role
+    } else {
+      setError(''); // Clear error if login is successful
+    }
+  }, [loginError, currentUser, role]);
+
   // Redirect to dashboard if already logged in
-  if (currentUser) {
-    navigate('/dashboard');
-  }
+  useEffect(() => {
+    if (currentUser && currentUser.role === role) {
+      navigate('/dashboard'); // Redirect to dashboard
+    }
+  }, [currentUser, role, navigate]);
+
   return (
     <div>
       <h2>Login</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
