@@ -8,7 +8,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <h1>Welcome to the eCommerce App</h1>
+      <h1>Welcome to GoodsHub</h1>
       <p>This app allows admins, sellers, and shoppers to manage users, post products, and make purchases.</p>
       
       <div className="home-navigation">
