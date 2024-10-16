@@ -31,7 +31,7 @@ const Checkout = () => {
   const { subtotal, tax, total } = calculateTotal(); // Calculate totals
 
   return (
-    <div>
+    <div className="checkout">
       <h2>Checkout</h2>
       {cart.length === 0 ? (
         <p>Your cart is empty. Please add items to your cart before checking out.</p>
